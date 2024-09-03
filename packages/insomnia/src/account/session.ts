@@ -25,6 +25,8 @@ export interface WhoamiResponse {
   planId: string;
   canManageTeams: boolean;
   maxTeamMembers: number;
+  encryptionEnabled: boolean;
+  encDriverKey: string;
 }
 
 export interface SessionData {
@@ -54,7 +56,7 @@ export async function absorbKey(sessionId: string, key: string) {
     accountId,
     firstName,
     lastName,
-  } = await _whoami(sessionId);
+  } = await whoami(sessionId);
   const symmetricKeyStr = crypt.decryptAES(key, JSON.parse(encSymmetricKey));
 
   // Store the information for later
@@ -160,7 +162,7 @@ export async function setSessionData(
 // Helper Functions //
 // ~~~~~~~~~~~~~~~~ //
 
-async function _whoami(sessionId: string | null = null): Promise<WhoamiResponse> {
+export async function whoami(sessionId: string | null = null): Promise<WhoamiResponse> {
   const response = await insomniaFetch<WhoamiResponse | string>({
     method: 'GET',
     path: '/auth/whoami',
